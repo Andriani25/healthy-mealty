@@ -2,17 +2,32 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Header from "../../components/Header";
 import { Button, Icon } from "@rneui/themed";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import RootStackParamList from "../../types";
 
-const Home = function () {
+const Home: React.FC = function () {
+  const { navigate } =
+    useNavigation<NativeStackNavigationProp<RootStackParamList, "Home">>();
+
+  const handleAddCaloriesOnPress = () => {
+    navigate("AddFood", {});
+  };
+
   return (
     <View style={styles.container}>
       <Header />
       <View style={styles.caloriesContainer}>
         <View style={styles.leftContainer}>
-          <Text>Calorías</Text>
+          <Text style={styles.title}>Calorías</Text>
         </View>
         <View style={styles.rightContainer}>
-          <Button icon={<Icon name="add-circle-outline" />} />
+          <Button
+            color={"primary"}
+            icon={<Icon name="add-circle-outline" color={"white"} />}
+            radius={"lg"}
+            onPress={handleAddCaloriesOnPress}
+          />
         </View>
       </View>
     </View>
@@ -33,6 +48,10 @@ const styles = StyleSheet.create({
   },
   leftContainer: { flex: 1, justifyContent: "center" },
   rightContainer: { flex: 1, alignItems: "flex-end", justifyContent: "center" },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
 });
 
 export default Home;
