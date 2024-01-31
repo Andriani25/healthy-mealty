@@ -1,18 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Header from "../../components/Header";
+import { Meal } from "../../types";
 import { Button, Icon } from "@rneui/themed";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import RootStackParamList from "../../types";
+import { RootStackParamList } from "../../types";
+import useFoodStorage from "../../hooks/useFoodStorage";
 
 const Home: React.FC = function () {
   const { navigate } =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "Home">>();
 
+  const [dailyFood, setDailyFood] = useState<Meal[]>([]);
+
   const handleAddCaloriesOnPress = () => {
     navigate("AddFood", {});
   };
+
+  useFocusEffect(() => {});
 
   return (
     <View style={styles.container}>

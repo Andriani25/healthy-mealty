@@ -1,7 +1,12 @@
-type RootStackParamList = {
+export type RootStackParamList = {
   Home: { name?: string; components?: any; options?: any };
   AddFood: { name?: string; components?: any; options?: any };
   Feed: { sort: "latest" | "top" } | undefined;
 };
 
-export default RootStackParamList;
+export type Meal = {
+  name: string;
+  calories: string;
+  portion: string;
+  date?: string;
+};
