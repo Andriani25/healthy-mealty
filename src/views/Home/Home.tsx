@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Header from "../../components/Header";
-import { Meal } from "../../types";
 import { Button, Icon } from "@rneui/themed";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types";
 import useFoodStorage from "../../hooks/useFoodStorage";
+import { Meal } from "../../types";
 
 const Home: React.FC = function () {
   const { navigate } =
@@ -14,18 +14,40 @@ const Home: React.FC = function () {
 
   const [dailyFood, setDailyFood] = useState<Meal[]>([]);
 
+  const { onGetDailyFoods } = useFoodStorage();
+
+  const getDailyFoods = useCallback(async () => {
+    try {
+      const actualFoods = await onGetDailyFoods();
+
+      if (actualFoods) {
+        setDailyFood(actualFoods);
+      }
+
+      console.log(dailyFood);
+
+      Promise.resolve();
+    } catch (error) {
+      Promise.reject(console.log(error));
+    }
+  }, []);
+
   const handleAddCaloriesOnPress = () => {
     navigate("AddFood", {});
   };
 
-  useFocusEffect(() => {});
+  useFocusEffect(
+    useCallback(() => {
+      getDailyFoods().catch(null);
+    }, [getDailyFoods])
+  );
 
   return (
     <View style={styles.container}>
       <Header />
       <View style={styles.caloriesContainer}>
         <View style={styles.leftContainer}>
-          <Text style={styles.title}>Calorías</Text>
+          <Text style={styles.title}>Comidas</Text>
         </View>
         <View style={styles.rightContainer}>
           <Button

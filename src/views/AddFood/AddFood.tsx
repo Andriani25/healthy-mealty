@@ -16,14 +16,14 @@ import useFoodStorage from "../../hooks/useFoodStorage";
 import MealCard from "../../components/MealCard";
 
 const AddFood = function () {
-  const { onSaveFood, onGetFoods, onRemoveFoods } = useFoodStorage();
+  const { onSaveFood, onGetFoods } = useFoodStorage();
   const [search, setSearch] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [foodList, setFoodList] = useState<Meal[]>([]);
   const [name, setName] = useState<string>("");
   const [calories, setCalories] = useState<string>("");
   const [portion, setPortion] = useState<string>("");
-  const [update, setUpdate] = useState<boolean>(false);
+  const [testName, setTestName] = useState<boolean>(false);
 
   const handleSubmitFood = async function () {
     try {
@@ -35,7 +35,6 @@ const AddFood = function () {
 
       Alert.alert("¡Comida guardad exitosamente!");
 
-      setUpdate(true);
       setIsVisible(false);
     } catch (error) {
       Alert.alert("Hubo un problema en guardar la comida..");
@@ -59,11 +58,17 @@ const AddFood = function () {
     }
   };
 
-  const handleRemoveFood = async function (value: string) {
+  const handleTestNameFood = async function (value: string) {
     try {
-      await onRemoveFoods(value);
+      const allFoods = await onGetFoods();
 
-      setUpdate(true);
+      if (
+        allFoods.find(
+          (item: Meal) => item.name.toLowerCase() === value.toLowerCase()
+        )
+      ) {
+        setTestName(true);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -80,18 +85,18 @@ const AddFood = function () {
       try {
         const allFoods = await onGetFoods();
 
-        setFoodList(allFoods);
-
-        setUpdate(false);
-
-        console.log(foodList);
+        if (allFoods !== foodList) {
+          setFoodList(allFoods);
+        } else {
+          console.log("Lista de comida actualizada");
+        }
       } catch (error) {
         console.error(error);
       }
     };
 
     getFoodList().catch(null);
-  }, [update]);
+  }, [foodList]);
 
   return (
     <View style={styles.container}>
@@ -116,12 +121,30 @@ const AddFood = function () {
               type="clear"
               size={"md"}
             />
+            {testName ? (
+              <View
+                style={{
+                  margin: 5,
+                  alignItems: "center",
+                }}
+              >
+                <Text style={styles.alert}>
+                  ¡Recuerda que no pueden haber dos comidas con el mismo nombre!
+                </Text>
+              </View>
+            ) : (
+              ""
+            )}
             <TextInput
               style={[styles.inputForm, { marginTop: 10 }]}
               textAlign="center"
               placeholder="Nombre de la comida"
               value={name}
-              onChangeText={(text: string) => setName(text)}
+              onChangeText={(text: string) => {
+                setName(text);
+
+                handleTestNameFood(text);
+              }}
             />
             <TextInput
               style={styles.inputForm}
@@ -149,7 +172,8 @@ const AddFood = function () {
               disabled={
                 calories.trim() === "" ||
                 name.trim() === "" ||
-                portion.trim() === ""
+                portion.trim() === "" ||
+                testName
               }
               onPress={handleSubmitFood}
             />
@@ -190,32 +214,7 @@ const AddFood = function () {
         style={{ backgroundColor: "#2089dc", marginTop: 40, borderRadius: 25 }}
       >
         {foodList?.map((meal) => (
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              margin: 15,
-            }}
-          >
-            <MealCard {...meal} key={meal.name} />
-            <View
-              style={{
-                flex: 1,
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Button
-                icon={<Icon name="delete" color="white" />}
-                type="clear"
-                size="sm"
-                buttonStyle={{ width: 40, height: 40, marginTop: 5 }}
-                onPress={() => handleRemoveFood(meal.name)}
-              />
-            </View>
-          </View>
+          <MealCard {...meal} key={meal.name} />
         ))}
       </ScrollView>
     </View>
@@ -258,6 +257,11 @@ const styles = StyleSheet.create({
   rightContainer: { flex: 1, alignItems: "flex-end", justifyContent: "center" },
   title: {
     fontSize: 20,
+    fontWeight: "bold",
+  },
+  alert: {
+    fontSize: 15,
+    color: "red",
     fontWeight: "bold",
   },
   input: {

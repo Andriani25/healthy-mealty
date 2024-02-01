@@ -1,15 +1,9 @@
-import React, { FC } from "react";
+import React, { FC, useState, useEffect } from "react";
 import { Text, View, StyleSheet } from "react-native";
 import { Meal } from "../../types";
 
-const DailyFood: FC<Meal> = function ({ calories, portion, name }) {
-  return (
-    <View style={styles.container}>
-      <Text>{name}</Text>
-      <Text>{calories}</Text>
-      <Text>{portion}</Text>
-    </View>
-  );
+const DailyFoods: FC = function () {
+  return <View style={styles.container}></View>;
 };
 
 const styles = StyleSheet.create({
@@ -18,6 +12,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  text: {
+    fontSize: 20,
+    height: 20,
+    width: 20,
+  },
 });
 
-export default DailyFood;
+export default DailyFoods;
