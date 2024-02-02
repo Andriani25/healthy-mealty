@@ -6,7 +6,7 @@ export type RootStackParamList = {
 
 export type Meal = {
   name: string;
-  calories: string;
+  calories: string | number
   portion: string;
   date?: string;
 };

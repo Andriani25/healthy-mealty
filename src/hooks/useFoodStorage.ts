@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Meal } from "../types";
+import { isToday, parse } from "date-fns";
 
 const MY_FOOD_KEY = "@MyFood:Key";
 const DAILY_FOOD_KEY = "@DailyFood:Key";
@@ -47,8 +48,6 @@ const useFoodStorage = function () {
     }
   };
   const handleRemoveFood = async (value: string) => {
-    console.log("VALOR QUE VIENE DEL BOTON", value);
-
     try {
       const Foods = await AsyncStorage.getItem(MY_FOOD_KEY);
 
@@ -90,6 +89,8 @@ const useFoodStorage = function () {
           date: new Date().toISOString(),
         });
 
+        console.log("DAILY ADD", parsedFoods);
+
         await AsyncStorage.setItem(DAILY_FOOD_KEY, JSON.stringify(parsedFoods));
 
         return Promise.resolve(console.log("Daily foods actualiced"));
@@ -97,7 +98,9 @@ const useFoodStorage = function () {
 
       await AsyncStorage.setItem(
         DAILY_FOOD_KEY,
-        JSON.stringify([{ calories, name, portion }])
+        JSON.stringify([
+          { calories, name, portion, date: new Date().toISOString() },
+        ])
       );
 
       return Promise.resolve(console.log("Nuevas comidas del día creadas"));
@@ -111,14 +114,26 @@ const useFoodStorage = function () {
       const Foods = await AsyncStorage.getItem(DAILY_FOOD_KEY);
 
       if (Foods !== null) {
-        const parsedFoods = JSON.parse(Foods);
+        const parsedFoods = JSON.parse(Foods) as Meal[];
 
-        console.log(parsedFoods);
+        const result = parsedFoods.filter(
+          (item) => item.date && isToday(new Date(item.date))
+        );
 
-        return Promise.resolve(parsedFoods);
+        console.log("Resultado de getDailyFoods", result);
+
+        return Promise.resolve(result);
       }
     } catch (error) {
       Promise.reject(error);
+    }
+  };
+
+  const handleRemoveDailyFoods = async () => {
+    try {
+      await AsyncStorage.removeItem(DAILY_FOOD_KEY);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -128,6 +143,7 @@ const useFoodStorage = function () {
     onRemoveFoods: handleRemoveFood,
     onAddDailyFood: handleAddDailyFood,
     onGetDailyFoods: handleGetDailyFoods,
+    onRemoveDailyFoods: handleRemoveDailyFoods,
   };
 };
 

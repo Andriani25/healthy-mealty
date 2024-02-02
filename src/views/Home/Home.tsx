@@ -6,6 +6,7 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../types";
 import useFoodStorage from "../../hooks/useFoodStorage";
+import ProgressCaloires from "../../components/ProgressCalories/ProgressCalories";
 import { Meal } from "../../types";
 
 const Home: React.FC = function () {
@@ -13,27 +14,30 @@ const Home: React.FC = function () {
     useNavigation<NativeStackNavigationProp<RootStackParamList, "Home">>();
 
   const [dailyFood, setDailyFood] = useState<Meal[]>([]);
+  const [totalCalories, setTotalCalories] = useState<number>(0);
 
-  const { onGetDailyFoods } = useFoodStorage();
+  const { onGetDailyFoods, onRemoveDailyFoods } = useFoodStorage();
 
   const getDailyFoods = useCallback(async () => {
     try {
-      const actualFoods = await onGetDailyFoods();
+      const actualFoods = (await onGetDailyFoods()) as Meal[];
 
-      if (actualFoods) {
-        setDailyFood(actualFoods);
-      }
-
-      console.log(dailyFood);
-
-      Promise.resolve();
+      actualFoods ? setDailyFood(actualFoods) : setDailyFood([]);
+      console.log("DAILY FOOD DALEE", dailyFood);
     } catch (error) {
-      Promise.reject(console.log(error));
+      setDailyFood([]);
+      console.error(error);
     }
   }, []);
 
   const handleAddCaloriesOnPress = () => {
     navigate("AddFood", {});
+  };
+
+  const handeRemoveDailyFood = async () => {
+    await onRemoveDailyFoods();
+
+    setDailyFood([]);
   };
 
   useFocusEffect(
@@ -58,6 +62,7 @@ const Home: React.FC = function () {
           />
         </View>
       </View>
+      <Button onPress={handeRemoveDailyFood} />
     </View>
   );
 };
