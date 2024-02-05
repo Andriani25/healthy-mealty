@@ -63,7 +63,7 @@ const AddFood = function () {
       const allFoods = await onGetFoods();
 
       if (
-        allFoods.find(
+        allFoods?.find(
           (item: Meal) => item.name.toLowerCase() === value.toLowerCase()
         )
       ) {
@@ -80,21 +80,20 @@ const AddFood = function () {
     setPortion("");
   }, [isVisible]);
 
-  useEffect(() => {
-    const getFoodList = async function () {
-      try {
-        const allFoods = await onGetFoods();
+  const getFoodList = async function () {
+    try {
+      const allFoods = await onGetFoods();
 
-        if (allFoods !== foodList) {
-          setFoodList(allFoods);
-        } else {
-          console.log("Lista de comida actualizada");
-        }
-      } catch (error) {
-        console.error(error);
+      if (allFoods !== foodList) {
+        setFoodList(allFoods);
+      } else {
+        console.log("Lista de comida actualizada");
       }
-    };
-
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  useEffect(() => {
     getFoodList().catch(null);
   }, [foodList]);
 

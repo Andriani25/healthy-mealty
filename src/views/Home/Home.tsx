@@ -22,6 +22,8 @@ const Home: React.FC = function () {
     try {
       const actualFoods = (await onGetDailyFoods()) as Meal[];
 
+      console.log("FOODS DEL USECALBACK", actualFoods);
+
       actualFoods ? setDailyFood(actualFoods) : setDailyFood([]);
       console.log("DAILY FOOD DALEE", dailyFood);
     } catch (error) {

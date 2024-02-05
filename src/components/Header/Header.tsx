@@ -1,25 +1,31 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Modal, TextInput } from "react-native";
+import { View, Text, StyleSheet, Modal, TextInput, Alert } from "react-native";
 import { Button, Icon, Image } from "@rneui/themed";
 import * as ImagePicker from "expo-image-picker";
+import useFoodStorage from "../../hooks/useFoodStorage";
 
 const Header = function () {
   const { canGoBack, goBack } = useNavigation();
 
-  const [hasGalleryPermission, setHasGalleryPermission] = useState(false);
+  const { onSetUserName, onSetUserImage, onGetUserImage, onGetUserName } =
+    useFoodStorage();
+
   const [isVisible, setIsVisible] = useState(false);
   const [nameUser, setNameUser] = useState<string>("Usuario");
-  const [picture, setPicture] = useState<string>("");
+  const [picture, setPicture] = useState<string>(
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRp0xKoXUryp0JZ1Sxp-99eQiQcFrmA1M1qbQ&usqp=CAU"
+  );
 
   useEffect(() => {
     async () => {
-      const galleryStatus = await ImagePicker.getMediaLibraryPermissionsAsync();
-      setHasGalleryPermission(galleryStatus.status === "granted");
+      const userName = await onGetUserName();
+      
+      if (userName) setNameUser(userName);
     };
   }, []);
 
-  const pickImage = async () => {
+  const handleImagePickerPress = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -31,6 +37,14 @@ const Header = function () {
     if (!result.canceled) {
       setPicture(result.assets[0].uri);
     }
+  };
+
+  const handleChangeUserName = async (value: string) => {
+    await onSetUserName(value);
+
+    Alert.alert("¡Usuario actualizado correctamente!");
+
+    setIsVisible(false);
   };
 
   return (
@@ -65,26 +79,41 @@ const Header = function () {
               type="clear"
               size={"md"}
             />
+            <Button
+              icon={<Icon name="image" color="white" />}
+              radius={"lg"}
+              title="Cambiar foto de perfil"
+              buttonStyle={{ margin: 5 }}
+              onPress={handleImagePickerPress}
+            />
             <TextInput
               style={[styles.inputForm, { marginTop: 10 }]}
               textAlign="center"
               placeholder="Nombre de usuario"
-              value={nameUser}
               onChangeText={(text: string) => {
                 setNameUser(text);
               }}
             />
+            <View style={{ alignItems: "center" }}>
+              <Button
+                title="Guardar"
+                size="sm"
+                radius={"lg"}
+                buttonStyle={{ height: 50, width: 80, margin: 15 }}
+                onPress={() => handleChangeUserName(nameUser)}
+              />
+            </View>
           </View>
         </View>
       </Modal>
       <View style={styles.leftContainer}>
-        <Text style={styles.title}>Hola Andriani Leandro</Text>
+        <Text style={styles.title}>{`Hola ${nameUser}`}</Text>
         <Text style={styles.subTitle}>¡Bienvenido de nuevo a tu objetivo!</Text>
       </View>
       <View style={styles.rightContainer}>
         <Image
           style={styles.avatar}
-          source={require("../../../assets/dev.png")}
+          source={{ uri: picture }}
           onPress={() => setIsVisible(true)}
         />
       </View>
