@@ -115,7 +115,7 @@ const useFoodStorage = function () {
     try {
       const Foods = await AsyncStorage.getItem(DAILY_FOOD_KEY);
 
-      console.log("RESPUESTA DEL ASYNC STORAGE", Foods)
+      console.log("RESPUESTA DEL ASYNC STORAGE", Foods);
 
       if (Foods !== null) {
         const parsedFoods = JSON.parse(Foods) as Meal[];
@@ -153,7 +153,11 @@ const useFoodStorage = function () {
 
       await AsyncStorage.setItem(USER_NAME_KEY, value);
 
-      return Promise.resolve();
+      const result = console.log(
+        `Usuario actualizado a ${value} desde useFoodStorage`
+      );
+
+      return Promise.resolve(result);
     } catch (error) {
       console.log(error);
     }
@@ -194,8 +198,6 @@ const useFoodStorage = function () {
   const handleGetUserImage = async () => {
     try {
       const response = await AsyncStorage.getItem(USER_IMAGE_KEY);
-
-      console.log("FOTO DE USUARIO", response);
 
       if (response) {
         return Promise.resolve(response);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { Button, Icon } from "@rneui/themed";
 import Header from "../../components/Header";
 
@@ -93,9 +94,11 @@ const AddFood = function () {
       console.error(error);
     }
   };
-  useEffect(() => {
-    getFoodList().catch(null);
-  }, [foodList]);
+  useFocusEffect(
+    useCallback(() => {
+      getFoodList().catch(null);
+    }, [])
+  );
 
   return (
     <View style={styles.container}>

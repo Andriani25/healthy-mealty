@@ -1,5 +1,5 @@
-import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, StyleSheet, Modal, TextInput, Alert } from "react-native";
 import { Button, Icon, Image } from "@rneui/themed";
 import * as ImagePicker from "expo-image-picker";
@@ -13,17 +13,45 @@ const Header = function () {
 
   const [isVisible, setIsVisible] = useState(false);
   const [nameUser, setNameUser] = useState<string>("Usuario");
+  const [inputValue, setInputValue] = useState<string>("");
   const [picture, setPicture] = useState<string>(
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRp0xKoXUryp0JZ1Sxp-99eQiQcFrmA1M1qbQ&usqp=CAU"
   );
 
-  useEffect(() => {
-    async () => {
+  const storageName = useCallback(async () => {
+    try {
       const userName = await onGetUserName();
-      
-      if (userName) setNameUser(userName);
-    };
+
+      if (userName) {
+        setNameUser(userName);
+
+        console.log(`Usuario cambiado a ${userName} desde Header`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }, []);
+
+  const storagePicture = async () => {
+    try {
+      const userPicture = await onGetUserImage();
+
+      if (userPicture) {
+        setPicture(userPicture);
+
+        console.log(`Foto cambiado correctamente desde Header`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      storageName().catch(null);
+      storagePicture().catch(null);
+    }, [storagePicture])
+  );
 
   const handleImagePickerPress = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -32,19 +60,23 @@ const Header = function () {
       aspect: [4, 3],
       quality: 1,
     });
-    console.log(result);
 
     if (!result.canceled) {
-      setPicture(result.assets[0].uri);
+      onSetUserImage(result.assets[0].uri);
+      Alert.alert("¡Foto de perfil actualizada!");
     }
   };
 
   const handleChangeUserName = async (value: string) => {
-    await onSetUserName(value);
+    try {
+      await onSetUserName(value);
 
-    Alert.alert("¡Usuario actualizado correctamente!");
+      Alert.alert("¡Usuario actualizado correctamente!");
 
-    setIsVisible(false);
+      setIsVisible(false);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -57,7 +89,9 @@ const Header = function () {
             onPress={() => goBack()}
           />
         </View>
-      ) : undefined}
+      ) : (
+        ""
+      )}
 
       <Modal
         visible={isVisible}
@@ -91,7 +125,7 @@ const Header = function () {
               textAlign="center"
               placeholder="Nombre de usuario"
               onChangeText={(text: string) => {
-                setNameUser(text);
+                setInputValue(text);
               }}
             />
             <View style={{ alignItems: "center" }}>
@@ -100,7 +134,7 @@ const Header = function () {
                 size="sm"
                 radius={"lg"}
                 buttonStyle={{ height: 50, width: 80, margin: 15 }}
-                onPress={() => handleChangeUserName(nameUser)}
+                onPress={() => handleChangeUserName(inputValue)}
               />
             </View>
           </View>

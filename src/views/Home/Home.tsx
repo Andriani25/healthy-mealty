@@ -45,7 +45,7 @@ const Home: React.FC = function () {
   useFocusEffect(
     useCallback(() => {
       getDailyFoods().catch(null);
-    }, [getDailyFoods])
+    }, [])
   );
 
   return (
