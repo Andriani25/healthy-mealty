@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Meal } from "../types";
-import { isToday } from "date-fns";
+import { isToday, parse } from "date-fns";
 
 const MY_FOOD_KEY = "@MyFood:Key";
 const DAILY_FOOD_KEY = "@DailyFood:Key";
@@ -64,7 +64,7 @@ const useFoodStorage = function () {
 
         await AsyncStorage.setItem(MY_FOOD_KEY, JSON.stringify(newFoods));
 
-        return Promise.resolve(console.log("Storage Actualiced"));
+        return Promise.resolve(console.log("Storage Updated!"));
       }
 
       return Promise.resolve(console.log("Storage Empty!"));
@@ -91,11 +91,9 @@ const useFoodStorage = function () {
           date: new Date().toISOString(),
         });
 
-        console.log("DAILY ADD", parsedFoods);
-
         await AsyncStorage.setItem(DAILY_FOOD_KEY, JSON.stringify(parsedFoods));
 
-        return Promise.resolve(console.log("Daily foods actualiced"));
+        return Promise.resolve();
       }
 
       await AsyncStorage.setItem(
@@ -115,18 +113,18 @@ const useFoodStorage = function () {
     try {
       const Foods = await AsyncStorage.getItem(DAILY_FOOD_KEY);
 
-      console.log("RESPUESTA DEL ASYNC STORAGE", Foods);
-
       if (Foods !== null) {
         const parsedFoods = JSON.parse(Foods) as Meal[];
 
-        const result = parsedFoods.filter(
-          (item) => item.date && isToday(new Date(item.date))
-        );
+        console.log("DAILY FOOD PARSEADA EN ASYNC STORAGE", parsedFoods);
 
-        console.log("Resultado de getDailyFoods", result);
+        if (parsedFoods) {
+          const result = parsedFoods.filter(
+            (item) => item.date && isToday(new Date(item.date))
+          );
 
-        return Promise.resolve(result);
+          return Promise.resolve(result);
+        }
       }
     } catch (error) {
       Promise.reject(error);
@@ -153,11 +151,7 @@ const useFoodStorage = function () {
 
       await AsyncStorage.setItem(USER_NAME_KEY, value);
 
-      const result = console.log(
-        `Usuario actualizado a ${value} desde useFoodStorage`
-      );
-
-      return Promise.resolve(result);
+      return Promise.resolve();
     } catch (error) {
       console.log(error);
     }
@@ -166,8 +160,6 @@ const useFoodStorage = function () {
   const handleGetUserName = async () => {
     try {
       const response = await AsyncStorage.getItem(USER_NAME_KEY);
-
-      console.log("NOMBRE DE USUARIO", response);
 
       if (response) {
         return Promise.resolve(response);

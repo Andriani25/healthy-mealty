@@ -69,7 +69,12 @@ const styles = StyleSheet.create({
     borderColor: "white",
     marginVertical: 15,
   },
-  leftContainer: { flex: 1, justifyContent: "center", alignItems: "center", marginLeft: 10 },
+  leftContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 10,
+  },
   rightContainer: { flex: 1, alignItems: "flex-end", justifyContent: "center" },
   text: {
     marginBottom: 10,

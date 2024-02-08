@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -11,13 +11,12 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import { Button, Icon } from "@rneui/themed";
 import Header from "../../components/Header";
-
+import MealCard from "../../components/MealCard";
 import { Meal } from "../../types";
 import useFoodStorage from "../../hooks/useFoodStorage";
-import MealCard from "../../components/MealCard";
 
 const AddFood = function () {
-  const { onSaveFood, onGetFoods } = useFoodStorage();
+  const { onSaveFood, onGetFoods, onRemoveFoods } = useFoodStorage();
   const [search, setSearch] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [foodList, setFoodList] = useState<Meal[]>([]);
@@ -34,9 +33,12 @@ const AddFood = function () {
         portion,
       });
 
-      Alert.alert("¡Comida guardad exitosamente!");
-
+      setName("");
+      setCalories("");
+      setPortion("");
       setIsVisible(false);
+
+      Alert.alert("¡Comida guardad exitosamente!");
     } catch (error) {
       Alert.alert("Hubo un problema en guardar la comida..");
 
@@ -68,36 +70,30 @@ const AddFood = function () {
           (item: Meal) => item.name.toLowerCase() === value.toLowerCase()
         )
       ) {
-        setTestName(true);
+        return setTestName(true);
       }
+      setTestName(false);
     } catch (error) {
       console.error(error);
     }
   };
 
-  useEffect(() => {
-    setName("");
-    setCalories("");
-    setPortion("");
-  }, [isVisible]);
-
-  const getFoodList = async function () {
+  const getFoodList = useCallback(async function () {
     try {
       const allFoods = await onGetFoods();
 
       if (allFoods !== foodList) {
         setFoodList(allFoods);
-      } else {
-        console.log("Lista de comida actualizada");
       }
     } catch (error) {
       console.error(error);
     }
-  };
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
       getFoodList().catch(null);
-    }, [])
+    }, [foodList])
   );
 
   return (

@@ -18,20 +18,6 @@ const Home: React.FC = function () {
 
   const { onGetDailyFoods, onRemoveDailyFoods } = useFoodStorage();
 
-  const getDailyFoods = useCallback(async () => {
-    try {
-      const actualFoods = (await onGetDailyFoods()) as Meal[];
-
-      console.log("FOODS DEL USECALBACK", actualFoods);
-
-      actualFoods ? setDailyFood(actualFoods) : setDailyFood([]);
-      console.log("DAILY FOOD DALEE", dailyFood);
-    } catch (error) {
-      setDailyFood([]);
-      console.error(error);
-    }
-  }, []);
-
   const handleAddCaloriesOnPress = () => {
     navigate("AddFood", {});
   };
@@ -42,10 +28,25 @@ const Home: React.FC = function () {
     setDailyFood([]);
   };
 
+  const getDailyFoodList = useCallback(async function () {
+    try {
+      const allFoods = (await onGetDailyFoods()) as Meal[];
+
+      console.log("RESPUESTA DE ASYNC STORAGE", allFoods);
+
+      if (allFoods !== dailyFood) {
+        setDailyFood(allFoods);
+        console.log("ESTADO DE DAILY FOOD", dailyFood);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
-      getDailyFoods().catch(null);
-    }, [])
+      getDailyFoodList().catch(null);
+    }, [getDailyFoodList])
   );
 
   return (
@@ -65,6 +66,9 @@ const Home: React.FC = function () {
         </View>
       </View>
       <Button onPress={handeRemoveDailyFood} />
+      {dailyFood?.map((food) => (
+        <Text>{food.name}</Text>
+      ))}
     </View>
   );
 };

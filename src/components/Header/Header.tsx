@@ -18,19 +18,17 @@ const Header = function () {
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRp0xKoXUryp0JZ1Sxp-99eQiQcFrmA1M1qbQ&usqp=CAU"
   );
 
-  const storageName = useCallback(async () => {
+  const storageName = async () => {
     try {
       const userName = await onGetUserName();
 
       if (userName) {
         setNameUser(userName);
-
-        console.log(`Usuario cambiado a ${userName} desde Header`);
       }
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  };
 
   const storagePicture = async () => {
     try {
@@ -38,8 +36,6 @@ const Header = function () {
 
       if (userPicture) {
         setPicture(userPicture);
-
-        console.log(`Foto cambiado correctamente desde Header`);
       }
     } catch (error) {
       console.log(error);
@@ -50,7 +46,7 @@ const Header = function () {
     useCallback(() => {
       storageName().catch(null);
       storagePicture().catch(null);
-    }, [storagePicture])
+    }, [storageName, storagePicture])
   );
 
   const handleImagePickerPress = async () => {
