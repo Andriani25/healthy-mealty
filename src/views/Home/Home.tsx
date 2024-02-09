@@ -4,17 +4,17 @@ import Header from "../../components/Header";
 import { Button, Icon } from "@rneui/themed";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types";
+import { RootStackParamList, Meal, Statistics } from "../../types";
 import useFoodStorage from "../../hooks/useFoodStorage";
 import ProgressCaloires from "../../components/ProgressCalories/ProgressCalories";
-import { Meal } from "../../types";
 
 const Home: React.FC = function () {
   const { navigate } =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "Home">>();
 
   const [dailyFood, setDailyFood] = useState<Meal[]>([]);
-  const [totalCalories, setTotalCalories] = useState<number>(0);
+  const [dailyStatistics, setDailyStatistics] = useState<Statistics>();
+  const [caloriesPerDay, setCaloriesPerDay] = useState<number>(2000);
 
   const { onGetDailyFoods, onRemoveDailyFoods } = useFoodStorage();
 
@@ -28,15 +28,24 @@ const Home: React.FC = function () {
     setDailyFood([]);
   };
 
+  const getStadistics = function (meals: Meal[]) {
+    try {
+  //    const reducer = meals.reduce((acc, curr) => {});
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const getDailyFoodList = useCallback(async function () {
     try {
       const allFoods = (await onGetDailyFoods()) as Meal[];
 
-      console.log("RESPUESTA DE ASYNC STORAGE", allFoods);
-
+   /*   const totalCalories = allFoods?.reduce((acum, curr) =>
+        parseInt(curr.calories)
+      );
+*/
       if (allFoods !== dailyFood) {
         setDailyFood(allFoods);
-        console.log("ESTADO DE DAILY FOOD", dailyFood);
       }
     } catch (error) {
       console.error(error);
@@ -65,10 +74,15 @@ const Home: React.FC = function () {
           />
         </View>
       </View>
-      <Button onPress={handeRemoveDailyFood} />
-      {dailyFood?.map((food) => (
-        <Text>{food.name}</Text>
-      ))}
+      <View style={styles.progressContainer}>
+        <ProgressCaloires {...dailyStatistics} />
+      </View>
+      <View style={styles.container}>
+        <Button onPress={handeRemoveDailyFood} />
+        {dailyFood?.map((food) => (
+          <Text key={food.date}>{food.name}</Text>
+        ))}
+      </View>
     </View>
   );
 };
@@ -78,6 +92,10 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 50,
     paddingHorizontal: 25,
+    backgroundColor: "#FFF",
+  },
+  progressContainer: {
+    flex: 1,
     backgroundColor: "#FFF",
   },
   caloriesContainer: {

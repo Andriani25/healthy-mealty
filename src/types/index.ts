@@ -4,6 +4,13 @@ export type RootStackParamList = {
   Feed: { sort: "latest" | "top" } | undefined;
 };
 
+export type Statistics = {
+  total: number | string;
+  consumido: number | string;
+  faltante: number | string;
+  porcentaje: number;
+};
+
 export type Meal = {
   name: string;
   calories: string | number;
