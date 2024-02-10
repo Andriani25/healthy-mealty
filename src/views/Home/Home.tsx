@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Alert } from "react-native";
 import Header from "../../components/Header";
+import DailyFoods from "../../components/DailyFoods";
 import { Button, Icon } from "@rneui/themed";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -14,7 +15,7 @@ const Home: React.FC = function () {
 
   const [dailyFood, setDailyFood] = useState<Meal[]>([]);
   const [dailyStatistics, setDailyStatistics] = useState<Statistics>();
-  const [caloriesPerDay, setCaloriesPerDay] = useState<number>(2000);
+  const [caloriesPerDay, setCaloriesPerDay] = useState<number>(2500);
 
   const { onGetDailyFoods, onRemoveDailyFoods } = useFoodStorage();
 
@@ -22,40 +23,45 @@ const Home: React.FC = function () {
     navigate("AddFood", {});
   };
 
-  const handeRemoveDailyFood = async () => {
-    await onRemoveDailyFoods();
-
-    setDailyFood([]);
-  };
-
   const getStadistics = function (meals: Meal[]) {
     try {
-  //    const reducer = meals.reduce((acc, curr) => {});
+      let total = 0;
+
+      meals?.forEach((meals) => (total = Number(meals.calories) + total));
+
+      let difference = caloriesPerDay - total;
+
+      let percentage = (total / caloriesPerDay) * 100;
+
+      setDailyStatistics({
+        total: caloriesPerDay,
+        consumido: total,
+        faltante: difference,
+        porcentaje: percentage,
+      });
     } catch (error) {
       console.log(error);
     }
   };
 
-  const getDailyFoodList = useCallback(async function () {
+  const getDailyFoodList = async function () {
     try {
       const allFoods = (await onGetDailyFoods()) as Meal[];
 
-   /*   const totalCalories = allFoods?.reduce((acum, curr) =>
-        parseInt(curr.calories)
-      );
-*/
+      getStadistics(allFoods);
+
       if (allFoods !== dailyFood) {
         setDailyFood(allFoods);
       }
     } catch (error) {
       console.error(error);
     }
-  }, []);
+  };
 
   useFocusEffect(
     useCallback(() => {
       getDailyFoodList().catch(null);
-    }, [getDailyFoodList])
+    }, [dailyFood])
   );
 
   return (
@@ -75,14 +81,20 @@ const Home: React.FC = function () {
         </View>
       </View>
       <View style={styles.progressContainer}>
-        <ProgressCaloires {...dailyStatistics} />
+        <ProgressCaloires {...(dailyStatistics as Statistics)} />
       </View>
-      <View style={styles.container}>
-        <Button onPress={handeRemoveDailyFood} />
+
+      <ScrollView
+        style={{
+          borderRadius: 15,
+          backgroundColor: "#2089dc",
+          flex: 1,
+        }}
+      >
         {dailyFood?.map((food) => (
-          <Text key={food.date}>{food.name}</Text>
+          <DailyFoods {...food} key={food.date} />
         ))}
-      </View>
+      </ScrollView>
     </View>
   );
 };

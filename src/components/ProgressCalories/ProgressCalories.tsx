@@ -15,12 +15,20 @@ const ProgressCaloires: FC<Statistics> = function ({
         <CircularProgress
           value={porcentaje}
           activeStrokeColor="#2089dc"
-          inActiveStrokeColor={"white"}
-          inActiveStrokeOpacity={0.4}
+          inActiveStrokeColor={"gray"}
+          activeStrokeSecondaryColor={"yellow"}
+          inActiveStrokeOpacity={0.5}
           progressValueColor={"black"}
           valueSuffix={"%"}
-          circleBackgroundColor="rgba(0,0,0,0.2)"
+          circleBackgroundColor="#FFF"
         />
+        {porcentaje > 100 ? (
+          <Text style={[styles.title, { color: "red" }]}>
+            ¡Superaste las calorías diarías..!
+          </Text>
+        ) : (
+          ""
+        )}
       </View>
       <View style={styles.rightContainer}>
         <Text style={styles.title}>Hoy</Text>

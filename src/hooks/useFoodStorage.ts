@@ -116,7 +116,7 @@ const useFoodStorage = function () {
       if (Foods !== null) {
         const parsedFoods = JSON.parse(Foods) as Meal[];
 
-        console.log("DAILY FOOD PARSEADA EN ASYNC STORAGE", parsedFoods);
+     
 
         if (parsedFoods) {
           const result = parsedFoods.filter(
@@ -131,11 +131,27 @@ const useFoodStorage = function () {
     }
   };
 
-  const handleRemoveDailyFoods = async () => {
+  const handleRemoveDailyFoods = async (value: string) => {
     try {
-      await AsyncStorage.removeItem(DAILY_FOOD_KEY);
+      const Foods = await AsyncStorage.getItem(DAILY_FOOD_KEY);
+
+      if (Foods !== null) {
+        const parsedFoods = JSON.parse(Foods);
+
+        const newFoods = parsedFoods.filter(
+          (food: Meal) => food.date?.toLowerCase() !== value.toLowerCase()
+        );
+
+        await AsyncStorage.removeItem(DAILY_FOOD_KEY);
+
+        await AsyncStorage.setItem(DAILY_FOOD_KEY, JSON.stringify(newFoods));
+
+        return Promise.resolve(console.log("Storage Updated!"));
+      }
+
+      return Promise.resolve(console.log("Storage Empty!"));
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 

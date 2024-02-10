@@ -24,6 +24,7 @@ const AddFood = function () {
   const [calories, setCalories] = useState<string>("");
   const [portion, setPortion] = useState<string>("");
   const [testName, setTestName] = useState<boolean>(false);
+  const [filterList, setFilterList] = useState<Meal[]>([]);
 
   const handleSubmitFood = async function () {
     try {
@@ -50,11 +51,11 @@ const AddFood = function () {
     try {
       const allFoods = await onGetFoods();
 
-      if (allFoods) {
+      if (allFoods && allFoods.length !== 0) {
         const newFoods = allFoods.filter((item: Meal) =>
           item.name.toLowerCase().includes(value.toLowerCase())
         );
-        setFoodList(newFoods);
+        setFilterList(newFoods);
       }
     } catch (error) {
       console.error(error);
@@ -180,7 +181,7 @@ const AddFood = function () {
       </Modal>
       <View style={styles.addContainer}>
         <View style={styles.leftContainer}>
-          <Text style={styles.title}>Add Food</Text>
+          <Text style={styles.title}>Nueva Comida</Text>
         </View>
         <View style={[styles.rightContainer, { marginRight: 15 }]}>
           <Button
@@ -211,9 +212,9 @@ const AddFood = function () {
       <ScrollView
         style={{ backgroundColor: "#2089dc", marginTop: 40, borderRadius: 25 }}
       >
-        {foodList?.map((meal) => (
-          <MealCard {...meal} key={meal.name} />
-        ))}
+        {filterList.length !== 0
+          ? filterList?.map((meal) => <MealCard {...meal} key={meal.name} />)
+          : foodList?.map((meal) => <MealCard {...meal} key={meal.name} />)}
       </ScrollView>
     </View>
   );
