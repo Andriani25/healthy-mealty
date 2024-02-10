@@ -5,9 +5,9 @@ export type RootStackParamList = {
 };
 
 export type Statistics = {
-  total: number | string;
-  consumido: number | string;
-  faltante: number | string;
+  total: number;
+  consumido: number;
+  faltante: number;
   porcentaje: number;
 };
 
