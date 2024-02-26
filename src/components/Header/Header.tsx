@@ -3,50 +3,16 @@ import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, StyleSheet, Modal, TextInput, Alert } from "react-native";
 import { Button, Icon, Image } from "@rneui/themed";
 import * as ImagePicker from "expo-image-picker";
-import useFoodStorage from "../../hooks/useFoodStorage";
+import { useUserStore } from "../../store/user";
+import { useShallow } from "zustand/react/shallow";
 
 const Header = function () {
   const { canGoBack, goBack } = useNavigation();
-
-  const { onSetUserName, onSetUserImage, onGetUserImage, onGetUserName } =
-    useFoodStorage();
-
   const [isVisible, setIsVisible] = useState(false);
-  const [nameUser, setNameUser] = useState<string>("Usuario");
   const [inputValue, setInputValue] = useState<string>("");
-  const [picture, setPicture] = useState<string>(
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRp0xKoXUryp0JZ1Sxp-99eQiQcFrmA1M1qbQ&usqp=CAU"
-  );
-
-  const storageName = async () => {
-    try {
-      const userName = await onGetUserName();
-
-      if (userName) {
-        setNameUser(userName);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const storagePicture = async () => {
-    try {
-      const userPicture = await onGetUserImage();
-
-      if (userPicture) {
-        setPicture(userPicture);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      storageName().catch(null);
-      storagePicture().catch(null);
-    }, [storageName, storagePicture])
+  const updateUser = useUserStore((state) => state.updateUser);
+  const [userName, picture] = useUserStore(
+    useShallow((state) => [state.name, state.picture])
   );
 
   const handleImagePickerPress = async () => {
@@ -58,15 +24,14 @@ const Header = function () {
     });
 
     if (!result.canceled) {
-      onSetUserImage(result.assets[0].uri);
+      updateUser({ picture: result.assets[0].uri });
       Alert.alert("¡Foto de perfil actualizada!");
     }
   };
 
   const handleChangeUserName = async (value: string) => {
     try {
-      await onSetUserName(value);
-
+      updateUser({ name: value });
       Alert.alert("¡Usuario actualizado correctamente!");
 
       setIsVisible(false);
@@ -137,7 +102,7 @@ const Header = function () {
         </View>
       </Modal>
       <View style={styles.leftContainer}>
-        <Text style={styles.title}>{`Hola ${nameUser}`}</Text>
+        <Text style={styles.title}>{`Hola ${userName}`}</Text>
         <Text style={styles.subTitle}>¡Bienvenido de nuevo a tu objetivo!</Text>
       </View>
       <View style={styles.rightContainer}>
