@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Meal } from "../types";
 import { isToday, parse } from "date-fns";
+import { useUserStore } from "../store/user";
 
 const MY_FOOD_KEY = "@MyFood:Key";
 const DAILY_FOOD_KEY = "@DailyFood:Key";
@@ -116,8 +117,6 @@ const useFoodStorage = function () {
       if (Foods !== null) {
         const parsedFoods = JSON.parse(Foods) as Meal[];
 
-     
-
         if (parsedFoods) {
           const result = parsedFoods.filter(
             (item) => item.date && isToday(new Date(item.date))
@@ -155,66 +154,6 @@ const useFoodStorage = function () {
     }
   };
 
-  const handleSetUserName = async (value: string) => {
-    try {
-      const response = await AsyncStorage.getItem(USER_NAME_KEY);
-
-      if (response) {
-        await AsyncStorage.removeItem(USER_NAME_KEY);
-
-        await AsyncStorage.setItem(USER_NAME_KEY, value);
-      }
-
-      await AsyncStorage.setItem(USER_NAME_KEY, value);
-
-      return Promise.resolve();
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleGetUserName = async () => {
-    try {
-      const response = await AsyncStorage.getItem(USER_NAME_KEY);
-
-      if (response) {
-        return Promise.resolve(response);
-      }
-    } catch (error) {
-      Promise.reject(error);
-    }
-  };
-
-  const handleSetUserImage = async (value: string) => {
-    try {
-      const response = await AsyncStorage.getItem(USER_IMAGE_KEY);
-
-      if (response) {
-        await AsyncStorage.removeItem(USER_IMAGE_KEY);
-
-        await AsyncStorage.setItem(USER_IMAGE_KEY, value);
-      }
-
-      await AsyncStorage.setItem(USER_IMAGE_KEY, value);
-
-      return Promise.resolve();
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleGetUserImage = async () => {
-    try {
-      const response = await AsyncStorage.getItem(USER_IMAGE_KEY);
-
-      if (response) {
-        return Promise.resolve(response);
-      }
-    } catch (error) {
-      Promise.reject(error);
-    }
-  };
-
   return {
     onSaveFood: handleSaveFood,
     onGetFoods: handleGetFoods,
@@ -222,10 +161,6 @@ const useFoodStorage = function () {
     onAddDailyFood: handleAddDailyFood,
     onGetDailyFoods: handleGetDailyFoods,
     onRemoveDailyFoods: handleRemoveDailyFoods,
-    onSetUserName: handleSetUserName,
-    onGetUserName: handleGetUserName,
-    onSetUserImage: handleSetUserImage,
-    onGetUserImage: handleGetUserImage,
   };
 };
 

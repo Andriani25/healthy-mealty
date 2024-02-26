@@ -4,12 +4,19 @@ import { Meal } from "../../types";
 import { Button, Icon } from "@rneui/themed";
 import useFoodStorage from "../../hooks/useFoodStorage";
 
-const MealCard: FC<Meal> = function ({ calories, portion, name }) {
-  const { onRemoveFoods, onAddDailyFood } = useFoodStorage();
+type Props = Meal & { onRemoveFoods: (id: string) => void };
 
-  const handleRemoveFood = async function (value: string) {
+const MealCard: FC<Props> = function ({
+  calories,
+  portion,
+  name,
+  onRemoveFoods,
+}) {
+  const { onAddDailyFood } = useFoodStorage();
+
+  const handleRemoveFood = function (value: string) {
     try {
-      await onRemoveFoods(value);
+      onRemoveFoods(value);
 
       Alert.alert("Comida borrada exitosamente");
     } catch (error) {

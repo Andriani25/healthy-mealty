@@ -44,6 +44,8 @@ const Home: React.FC = function () {
     }
   };
 
+  console.log("AFUERA DE LA FUNCIÓN", dailyFood);
+
   const getDailyFoodList = async function () {
     try {
       const allFoods = (await onGetDailyFoods()) as Meal[];
@@ -53,6 +55,8 @@ const Home: React.FC = function () {
       if (allFoods !== dailyFood) {
         setDailyFood(allFoods);
       }
+
+      console.log("DENTRO DE LA FUNCIÓN", dailyFood);
     } catch (error) {
       console.error(error);
     }

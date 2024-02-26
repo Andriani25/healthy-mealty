@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -38,6 +38,9 @@ const AddFood = function () {
       setCalories("");
       setPortion("");
       setIsVisible(false);
+      setFoodList((prev) => {
+        return [...prev, { name, calories, portion }];
+      });
 
       Alert.alert("¡Comida guardad exitosamente!");
     } catch (error) {
@@ -79,23 +82,35 @@ const AddFood = function () {
     }
   };
 
-  const getFoodList = useCallback(async function () {
+  console.log("FUERA DE LA FUNCIÓN ADDFOOD", foodList);
+
+  const getFoodList = async function () {
     try {
       const allFoods = await onGetFoods();
 
       if (allFoods !== foodList) {
         setFoodList(allFoods);
       }
+
+      console.log("DENTRO DE LA FUNCIÓN ADD FOOD", foodList);
     } catch (error) {
       console.error(error);
     }
-  }, []);
+  };
 
-  useFocusEffect(
-    useCallback(() => {
-      getFoodList().catch(null);
-    }, [foodList])
-  );
+  useEffect(() => {
+    getFoodList().catch(null);
+  }, []);
+  function handleRemove(name: string) {
+    onRemoveFoods(name);
+    setFoodList((prev) => prev.filter((food) => food.name !== name));
+  }
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     getFoodList().catch(null);
+  //   }, [foodList])
+  // );
 
   return (
     <View style={styles.container}>
@@ -213,8 +228,20 @@ const AddFood = function () {
         style={{ backgroundColor: "#2089dc", marginTop: 40, borderRadius: 25 }}
       >
         {filterList.length !== 0
-          ? filterList?.map((meal) => <MealCard {...meal} key={meal.name} />)
-          : foodList?.map((meal) => <MealCard {...meal} key={meal.name} />)}
+          ? filterList?.map((meal) => (
+              <MealCard
+                {...meal}
+                key={meal.name}
+                onRemoveFoods={handleRemove}
+              />
+            ))
+          : foodList?.map((meal) => (
+              <MealCard
+                {...meal}
+                key={meal.name}
+                onRemoveFoods={handleRemove}
+              />
+            ))}
       </ScrollView>
     </View>
   );
